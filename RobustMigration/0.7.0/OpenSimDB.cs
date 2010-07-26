@@ -300,7 +300,7 @@ namespace RobustMigration.v070
 #endif     // MONO_STRICT
 	#endregion
 	
-	[Table(Name="opensim.assets")]
+	[Table(Name="assets")]
 	public partial class assets : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -641,7 +641,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.auth")]
+	[Table(Name="auth")]
 	public partial class auth : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -820,7 +820,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.avatars")]
+	[Table(Name="avatars")]
 	public partial class avatars : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -943,7 +943,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.estateban")]
+	[Table(Name="estateban")]
 	public partial class estateban
 	{
 		
@@ -1087,7 +1087,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.estate_groups")]
+	[Table(Name="estate_groups")]
 	public partial class estategroups
 	{
 		
@@ -1153,7 +1153,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.estate_managers")]
+	[Table(Name="estate_managers")]
 	public partial class estatemanagers
 	{
 		
@@ -1219,7 +1219,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.estate_map")]
+	[Table(Name="estate_map")]
 	public partial class estatemap : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -1313,7 +1313,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.estate_settings")]
+	[Table(Name="estate_settings")]
 	public partial class estatesettings : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -2003,7 +2003,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.estate_users")]
+	[Table(Name="estate_users")]
 	public partial class estateusers
 	{
 		
@@ -2069,7 +2069,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.friends")]
+	[Table(Name="friends")]
 	public partial class friends : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -2220,7 +2220,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.griduser")]
+	[Table(Name="griduser")]
 	public partial class griduser : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -2539,7 +2539,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.inventoryfolders")]
+	[Table(Name="inventoryfolders")]
 	public partial class inventoryfolders : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -2744,7 +2744,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.inventoryitems")]
+	[Table(Name="inventoryitems")]
 	public partial class inventoryitems : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -3331,7 +3331,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.land")]
+	[Table(Name="land")]
 	public partial class land : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -4300,7 +4300,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.landaccesslist")]
+	[Table(Name="landaccesslist")]
 	public partial class landaccesslist
 	{
 		
@@ -4392,7 +4392,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.migrations")]
+	[Table(Name="migrations")]
 	public partial class migrations
 	{
 		
@@ -4458,7 +4458,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.presence")]
+	[Table(Name="presence")]
 	public partial class presence : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -4609,7 +4609,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.primitems")]
+	[Table(Name="primitems")]
 	public partial class primitems : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -5171,7 +5171,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.prims")]
+	[Table(Name="prims")]
 	public partial class prims : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -7359,7 +7359,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.primshapes")]
+	[Table(Name="primshapes")]
 	public partial class primshapes : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -8130,7 +8130,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.regionban")]
+	[Table(Name="regionban")]
 	public partial class regionban
 	{
 		
@@ -8249,7 +8249,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.regions")]
+	[Table(Name="regions")]
 	public partial class regions : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -9280,7 +9280,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.regionsettings")]
+	[Table(Name="regionsettings")]
 	public partial class regionsettings : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -10407,7 +10407,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.terrain")]
+	[Table(Name="terrain")]
 	public partial class terrain
 	{
 		
@@ -10499,7 +10499,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.tokens")]
+	[Table(Name="tokens")]
 	public partial class tokens : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -10621,7 +10621,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="opensim.useraccounts")]
+	[Table(Name="useraccounts")]
 	public partial class useraccounts : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		

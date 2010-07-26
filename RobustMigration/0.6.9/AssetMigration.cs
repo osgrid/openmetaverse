@@ -30,6 +30,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.IO;
 using System.Net;
+using System.Threading;
 using MySql.Data.MySqlClient;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
@@ -38,9 +39,12 @@ namespace RobustMigration.v069
 {
     public class AssetMigration
     {
+        private const int MAX_CONCURRENT_UPLOADS = 5;
+
         private MySqlConnection m_connection;
         private opensim m_db;
         private string m_assetUrl;
+        private Semaphore m_semaphore = new Semaphore(MAX_CONCURRENT_UPLOADS, MAX_CONCURRENT_UPLOADS);
 
         public AssetMigration(string connectString, string assetServiceUrl)
         {
@@ -68,7 +72,6 @@ namespace RobustMigration.v069
             AssetType type = (AssetType)asset.assetType;
             string contentType = LLUtil.SLAssetTypeToContentType((int)type);
             bool isPublic = true;
-            string errorMessage = null;
 
             // Don't bother copying temporary assets
             if (asset.temporary != 0)
@@ -87,56 +90,81 @@ namespace RobustMigration.v069
                     break;
             }
 
-            // Build the remote storage request
-            List<MultipartForm.Element> postParameters = new List<MultipartForm.Element>()
-            {
-                new MultipartForm.Parameter("AssetID", asset.id),
-                new MultipartForm.Parameter("Public", isPublic ? "1" : "0"),
-                new MultipartForm.File("Asset", asset.name, contentType, asset.data)
-            };
+            object[] args = new object[] { asset.id, isPublic, asset.name, contentType, asset.data };
 
-            // Make the remote storage request
+            m_semaphore.WaitOne();
+            ThreadPool.QueueUserWorkItem(DoCreateAsset, args);
+        }
+
+        private void DoCreateAsset(object o)
+        {
             try
             {
-                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(m_assetUrl);
+                object[] array = (object[])o;
 
-                HttpWebResponse response = MultipartForm.Post(request, postParameters);
-                using (Stream responseStream = response.GetResponseStream())
+                string assetID = (string)array[0];
+                bool isPublic = (bool)array[1];
+                string assetName = (string)array[2];
+                string contentType = (string)array[3];
+                byte[] assetData = (byte[])array[4];
+
+                string errorMessage = null;
+
+                // Build the remote storage request
+                List<MultipartForm.Element> postParameters = new List<MultipartForm.Element>()
+            {
+                new MultipartForm.Parameter("AssetID", assetID),
+                new MultipartForm.Parameter("Public", isPublic ? "1" : "0"),
+                new MultipartForm.File("Asset", assetName, contentType, assetData)
+            };
+
+                // Make the remote storage request
+                try
                 {
-                    string responseStr = null;
+                    HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(m_assetUrl);
 
-                    try
+                    HttpWebResponse response = MultipartForm.Post(request, postParameters);
+                    using (Stream responseStream = response.GetResponseStream())
                     {
-                        responseStr = responseStream.GetStreamString();
-                        OSD responseOSD = OSDParser.Deserialize(responseStr);
-                        if (responseOSD.Type == OSDType.Map)
+                        string responseStr = null;
+
+                        try
                         {
-                            OSDMap responseMap = (OSDMap)responseOSD;
-                            if (responseMap["Success"].AsBoolean())
-                                return;
+                            responseStr = responseStream.GetStreamString();
+                            OSD responseOSD = OSDParser.Deserialize(responseStr);
+                            if (responseOSD.Type == OSDType.Map)
+                            {
+                                OSDMap responseMap = (OSDMap)responseOSD;
+                                if (responseMap["Success"].AsBoolean())
+                                    return;
+                                else
+                                    errorMessage = "Upload failed: " + responseMap["Message"].AsString();
+                            }
                             else
-                                errorMessage = "Upload failed: " + responseMap["Message"].AsString();
+                            {
+                                errorMessage = "Response format was invalid:\n" + responseStr;
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            errorMessage = "Response format was invalid:\n" + responseStr;
+                            if (!String.IsNullOrEmpty(responseStr))
+                                errorMessage = "Failed to parse the response:\n" + responseStr;
+                            else
+                                errorMessage = "Failed to retrieve the response: " + ex.Message;
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        if (!String.IsNullOrEmpty(responseStr))
-                            errorMessage = "Failed to parse the response:\n" + responseStr;
-                        else
-                            errorMessage = "Failed to retrieve the response: " + ex.Message;
                     }
                 }
-            }
-            catch (WebException ex)
-            {
-                errorMessage = ex.Message;
-            }
+                catch (WebException ex)
+                {
+                    errorMessage = ex.Message;
+                }
 
-            Console.WriteLine("Failed to store asset \"{0}\" ({1}, {2}): {3}", asset.name, asset.id, contentType, errorMessage);
+                Console.WriteLine("Failed to store asset \"{0}\" ({1}, {2}): {3}", assetName, assetID, contentType, errorMessage);
+            }
+            finally
+            {
+                m_semaphore.Release();
+            }
         }
     }
 }
