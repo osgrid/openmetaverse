@@ -50,19 +50,34 @@ namespace RobustMigration.v069
         {
             using (m_connection = new MySqlConnection(connectString))
             {
-                using (m_db = new opensim(m_connection))
+                m_assetUrl = assetServiceUrl;
+
+                for (int i = 0; i < 4096; i++)
                 {
-                    m_assetUrl = assetServiceUrl;
+                    string lstr = i.ToString("x3");
+                    string hstr = (i + 1).ToString("x3");
+                    CreateAssetSet(lstr, hstr);
+                }
 
-                    var assets = from a in m_db.assets
-                                 select a;
+                CreateAssetSet("fff", "zzz");
+            }
+        }
 
-                    int i = 0;
-                    foreach (var asset in assets)
-                    {
-                        CreateAsset(asset);
-                        if (++i % 10 == 0) Console.Write(".");
-                    }
+        private void CreateAssetSet(string lstr, string hstr)
+        {
+            string query = String.Format("SELECT * FROM assets where id > '{0}' and id <= '{1}'", lstr, hstr);
+            Console.WriteLine(String.Empty);
+            Console.WriteLine(query);
+
+            using (m_db = new opensim(m_connection))
+            {
+                var assets = m_db.ExecuteQuery<assets>(query);
+
+                int count = 0;
+                foreach (var asset in assets)
+                {
+                    CreateAsset(asset);
+                    if (++count % 10 == 0) Console.Write(".");
                 }
             }
         }
