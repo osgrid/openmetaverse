@@ -197,12 +197,21 @@ namespace RobustMigration.v069
         private void AddIdentity(users user)
         {
             string name = user.username + " " + user.lastname;
+            string credential = user.passwordHash;
+
+            // If the password is actually salted store "hash:salt"
+            if (String.IsNullOrEmpty(user.passwordSalt))
+                credential += ":" + user.passwordSalt;
+
+            // Make sure $1$ is prepended (our md5hash format in SimianGrid requires this)
+            if (!credential.StartsWith("$1$"))
+                credential = "$1$" + credential;
 
             NameValueCollection requestArgs = new NameValueCollection
             {
                 { "RequestMethod", "AddIdentity" },
                 { "Identifier", name },
-                { "Credential", user.passwordHash + ":" + user.passwordSalt },
+                { "Credential", credential },
                 { "Type", "md5hash" },
                 { "UserID", user.UUID }
             };

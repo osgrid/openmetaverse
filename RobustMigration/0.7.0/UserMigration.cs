@@ -212,11 +212,21 @@ namespace RobustMigration.v070
             var auth = m_db.auth.SingleOrDefault(a => a.UUID == user.PrincipalID);
             if (auth != null && auth.accountType == USER_ACCOUNT_TYPE)
             {
+                string credential = auth.passwordHash;
+
+                // If the password is actually salted store "hash:salt"
+                if (String.IsNullOrEmpty(auth.passwordSalt))
+                    credential += ":" + auth.passwordSalt;
+
+                // Make sure $1$ is prepended (our md5hash format in SimianGrid requires this)
+                if (!credential.StartsWith("$1$"))
+                    credential = "$1$" + credential;
+
                 NameValueCollection requestArgs = new NameValueCollection
                 {
                     { "RequestMethod", "AddIdentity" },
                     { "Identifier", name },
-                    { "Credential", auth.passwordHash + ":" + auth.passwordSalt },
+                    { "Credential", credential },
                     { "Type", "md5hash" },
                     { "UserID", user.PrincipalID }
                 };
