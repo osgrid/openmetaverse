@@ -99,13 +99,18 @@ namespace RobustMigration.v070
         {
             // Create this user
             string name = user.FirstName + " " + user.LastName;
+            string email = user.Email;
+
+            // Cannot have an empty e-mail address
+            if (String.IsNullOrEmpty(email))
+                email = "INVALID " + UUID.Random().ToString();
 
             NameValueCollection requestArgs = new NameValueCollection
             {
                 { "RequestMethod", "AddUser" },
                 { "UserID", user.PrincipalID },
                 { "Name", name },
-                { "Email", user.Email },
+                { "Email", email },
                 { "AccessLevel", user.UserLevel.ToString() }
             };
 
