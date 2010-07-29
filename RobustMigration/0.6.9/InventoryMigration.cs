@@ -125,7 +125,14 @@ namespace RobustMigration.v069
 
         private void CreateItem(inventoryitems item)
         {
+            const int DEFAULT_PERMS = 2147483647;
+
             ++m_counter;
+
+            AssetType assetType = (item.assetType.HasValue) ? (AssetType)item.assetType.Value : AssetType.Unknown;
+            InventoryType inventoryType = (item.invType.HasValue) ? (InventoryType)item.invType.Value : InventoryType.Unknown;
+            UUID groupID;
+            UUID.TryParse(item.groupID, out groupID);
 
             // Create this item
             OSDMap permissions = new OSDMap
@@ -133,14 +140,14 @@ namespace RobustMigration.v069
                 { "BaseMask", OSD.FromInteger(item.inventoryBasePermissions) },
                 { "EveryoneMask", OSD.FromInteger(item.inventoryEveryOnePermissions) },
                 { "GroupMask", OSD.FromInteger(item.inventoryGroupPermissions) },
-                { "NextOwnerMask", OSD.FromInteger(item.inventoryNextPermissions.HasValue ? item.inventoryNextPermissions.Value : 0) },
-                { "OwnerMask", OSD.FromInteger(item.inventoryCurrentPermissions.HasValue ? item.inventoryCurrentPermissions.Value : 0) }
+                { "NextOwnerMask", OSD.FromInteger(item.inventoryNextPermissions.HasValue ? item.inventoryNextPermissions.Value : DEFAULT_PERMS) },
+                { "OwnerMask", OSD.FromInteger(item.inventoryCurrentPermissions.HasValue ? item.inventoryCurrentPermissions.Value : DEFAULT_PERMS) }
             };
 
             OSDMap extraData = new OSDMap()
             {
                 { "Flags", OSD.FromInteger(item.flags) },
-                { "GroupID", OSD.FromString(item.groupID) },
+                { "GroupID", OSD.FromUUID(groupID) },
                 { "GroupOwned", OSD.FromBoolean(item.groupOwned != 0) },
                 { "SalePrice", OSD.FromInteger(item.salePrice) },
                 { "SaleType", OSD.FromInteger(item.saleType) },
@@ -149,8 +156,8 @@ namespace RobustMigration.v069
 
             // Add different asset type only if it differs from inventory type
             // (needed for links)
-            string invContentType = LLUtil.SLInvTypeToContentType(item.invType.HasValue ? item.invType.Value : 0);
-            string assetContentType = LLUtil.SLAssetTypeToContentType(item.assetType.HasValue ? item.assetType.Value : 0);
+            string invContentType = LLUtil.SLInvTypeToContentType((int)inventoryType);
+            string assetContentType = LLUtil.SLAssetTypeToContentType((int)assetType);
             if (invContentType != assetContentType)
                 extraData["LinkedItemType"] = OSD.FromString(assetContentType);
 
@@ -174,7 +181,6 @@ namespace RobustMigration.v069
             if (success)
             {
                 // Gesture handling
-                AssetType assetType = (item.assetType.HasValue) ? (AssetType)item.assetType.Value : AssetType.Unknown;
                 if (assetType == AssetType.Gesture)
                     UpdateGesture(UUID.Parse(item.avatarID), UUID.Parse(item.inventoryID), item.flags == 1);
             }
