@@ -125,8 +125,6 @@ namespace RobustMigration.v069
 
         private void CreateItem(inventoryitems item)
         {
-            const int DEFAULT_PERMS = 2147483647;
-
             ++m_counter;
 
             AssetType assetType = (item.assetType.HasValue) ? (AssetType)item.assetType.Value : AssetType.Unknown;
@@ -140,8 +138,8 @@ namespace RobustMigration.v069
                 { "BaseMask", OSD.FromInteger(item.inventoryBasePermissions) },
                 { "EveryoneMask", OSD.FromInteger(item.inventoryEveryOnePermissions) },
                 { "GroupMask", OSD.FromInteger(item.inventoryGroupPermissions) },
-                { "NextOwnerMask", OSD.FromInteger(item.inventoryNextPermissions.HasValue ? item.inventoryNextPermissions.Value : DEFAULT_PERMS) },
-                { "OwnerMask", OSD.FromInteger(item.inventoryCurrentPermissions.HasValue ? item.inventoryCurrentPermissions.Value : DEFAULT_PERMS) }
+                { "NextOwnerMask", OSD.FromInteger(item.inventoryNextPermissions.HasValue ? item.inventoryNextPermissions.Value : item.inventoryBasePermissions) },
+                { "OwnerMask", OSD.FromInteger(item.inventoryCurrentPermissions.HasValue ? item.inventoryCurrentPermissions.Value : item.inventoryBasePermissions) }
             };
 
             OSDMap extraData = new OSDMap()
