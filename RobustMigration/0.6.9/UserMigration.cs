@@ -200,7 +200,7 @@ namespace RobustMigration.v069
             string credential = user.passwordHash;
 
             // If the password is actually salted store "hash:salt"
-            if (String.IsNullOrEmpty(user.passwordSalt))
+            if (!String.IsNullOrEmpty(user.passwordSalt))
                 credential += ":" + user.passwordSalt;
 
             // Make sure $1$ is prepended (our md5hash format in SimianGrid requires this)
