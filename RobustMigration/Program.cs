@@ -55,7 +55,7 @@ namespace RobustMigration
             };
             set.Parse(args);
 
-            if (String.IsNullOrEmpty(connectionString) || String.IsNullOrEmpty(userUrl) || String.IsNullOrEmpty(inventoryUrl) || String.IsNullOrEmpty(assetUrl))
+            if (String.IsNullOrEmpty(connectionString))
                 printHelp = true;
 
             if (printHelp || printVersion)
@@ -133,36 +133,70 @@ namespace RobustMigration
         static void Migrate069(string connectionString, string userUrl, string assetUrl, string inventoryUrl)
         {
             Console.WriteLine("Migrating from OpenSim 0.6.9 to SimianGrid");
-            Console.WriteLine("Starting user migrations");
-            v069.UserMigration users = new v069.UserMigration(connectionString, userUrl);
-            Console.WriteLine();
-            Console.WriteLine("Starting asset migrations");
-            v069.AssetMigration assets = new v069.AssetMigration(connectionString, assetUrl);
-            Console.WriteLine();
-            Console.WriteLine("Starting inventory migrations");
-            v069.InventoryMigration inventories = new v069.InventoryMigration(connectionString, inventoryUrl, userUrl);
-            Console.WriteLine();
-            Console.WriteLine("Starting friend migrations");
-            v069.FriendMigration friends = new v069.FriendMigration(connectionString, userUrl);
-            Console.WriteLine();
+
+            if (!String.IsNullOrEmpty(userUrl))
+            {
+                Console.WriteLine("Starting user migrations");
+                v069.UserMigration users = new v069.UserMigration(connectionString, userUrl);
+                Console.WriteLine();
+            }
+
+            if (!String.IsNullOrEmpty(assetUrl))
+            {
+                Console.WriteLine("Starting asset migrations");
+                v069.AssetMigration assets = new v069.AssetMigration(connectionString, assetUrl);
+                Console.WriteLine();
+            }
+
+            if (!String.IsNullOrEmpty(inventoryUrl) && !String.IsNullOrEmpty(userUrl))
+            {
+                Console.WriteLine("Starting inventory migrations");
+                v069.InventoryMigration inventories = new v069.InventoryMigration(connectionString, inventoryUrl, userUrl);
+                Console.WriteLine();
+            }
+
+            if (!String.IsNullOrEmpty(userUrl))
+            {
+                Console.WriteLine("Starting friend migrations");
+                v069.FriendMigration friends = new v069.FriendMigration(connectionString, userUrl);
+                Console.WriteLine();
+            }
+
             Console.WriteLine("Done.");
         }
 
         static void Migrate070(string connectionString, string userUrl, string assetUrl, string inventoryUrl)
         {
             Console.WriteLine("Migrating from OpenSim 0.7.0 to SimianGrid");
-            Console.WriteLine("Starting user migrations");
-            v070.UserMigration users = new v070.UserMigration(connectionString, userUrl);
-            Console.WriteLine();
-            Console.WriteLine("Starting asset migrations");
-            v070.AssetMigration assets = new v070.AssetMigration(connectionString, assetUrl);
-            Console.WriteLine();
-            Console.WriteLine("Starting inventory migrations");
-            v069.InventoryMigration inventories = new v069.InventoryMigration(connectionString, inventoryUrl, userUrl);
-            Console.WriteLine();
-            Console.WriteLine("Starting friend migrations");
-            v070.FriendMigration friends = new v070.FriendMigration(connectionString, userUrl);
-            Console.WriteLine();
+
+            if (!String.IsNullOrEmpty(userUrl))
+            {
+                Console.WriteLine("Starting user migrations");
+                v070.UserMigration users = new v070.UserMigration(connectionString, userUrl);
+                Console.WriteLine();
+            }
+
+            if (!String.IsNullOrEmpty(assetUrl))
+            {
+                Console.WriteLine("Starting asset migrations");
+                v070.AssetMigration assets = new v070.AssetMigration(connectionString, assetUrl);
+                Console.WriteLine();
+            }
+
+            if (!String.IsNullOrEmpty(inventoryUrl) && !String.IsNullOrEmpty(userUrl))
+            {
+                Console.WriteLine("Starting inventory migrations");
+                v069.InventoryMigration inventories = new v069.InventoryMigration(connectionString, inventoryUrl, userUrl);
+                Console.WriteLine();
+            }
+
+            if (!String.IsNullOrEmpty(userUrl))
+            {
+                Console.WriteLine("Starting friend migrations");
+                v070.FriendMigration friends = new v070.FriendMigration(connectionString, userUrl);
+                Console.WriteLine();
+            }
+
             Console.WriteLine("Done.");
         }
     }

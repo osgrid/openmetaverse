@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using MySql.Data.MySqlClient;
@@ -42,6 +43,7 @@ namespace RobustMigration.v069
         private string m_inventoryUrl;
         private string m_userUrl;
         private int m_counter;
+        private Dictionary<string, string> m_rewriteFolderIDs = new Dictionary<string, string>();
 
         public InventoryMigration(string connectString, string inventoryServiceUrl, string userServiceUrl)
         {
@@ -58,6 +60,10 @@ namespace RobustMigration.v069
 
                     foreach (var rootFolder in rootFolders)
                     {
+                        // SimianGrid uses UserIDs as root inventory folderIDs. Rewrite all of the 
+                        // root folderIDs
+                        m_rewriteFolderIDs[rootFolder.folderID] = rootFolder.agentID;
+
                         CreateFolder(rootFolder);
 
                         m_counter = 0;
@@ -73,11 +79,19 @@ namespace RobustMigration.v069
 
             #region Folder Creation
 
+            string folderID = folder.folderID;
+            if (m_rewriteFolderIDs.ContainsKey(folderID))
+                folderID = m_rewriteFolderIDs[folderID];
+
+            string parentFolderID = folder.parentFolderID;
+            if (m_rewriteFolderIDs.ContainsKey(parentFolderID))
+                parentFolderID = m_rewriteFolderIDs[parentFolderID];
+
             NameValueCollection requestArgs = new NameValueCollection
             {
                 { "RequestMethod", "AddInventoryFolder" },
-                { "FolderID", folder.folderID },
-                { "ParentID", folder.parentFolderID },
+                { "FolderID", folderID },
+                { "ParentID", parentFolderID },
                 { "OwnerID", folder.agentID },
                 { "Name", folder.folderName },
                 { "ContentType", LLUtil.SLAssetTypeToContentType(folder.type) }
@@ -132,6 +146,10 @@ namespace RobustMigration.v069
             UUID groupID;
             UUID.TryParse(item.groupID, out groupID);
 
+            string parentFolderID = item.parentFolderID;
+            if (m_rewriteFolderIDs.ContainsKey(parentFolderID))
+                parentFolderID = m_rewriteFolderIDs[parentFolderID];
+
             // Create this item
             OSDMap permissions = new OSDMap
             {
@@ -164,7 +182,7 @@ namespace RobustMigration.v069
                 { "RequestMethod", "AddInventoryItem" },
                 { "ItemID", item.inventoryID },
                 { "AssetID", item.assetID },
-                { "ParentID", item.parentFolderID },
+                { "ParentID", parentFolderID },
                 { "OwnerID", item.avatarID },
                 { "Name", item.inventoryName },
                 { "Description", item.inventoryDescription },
