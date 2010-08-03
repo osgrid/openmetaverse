@@ -177,16 +177,25 @@ namespace RobustMigration.v069
             if (invContentType != assetContentType)
                 extraData["LinkedItemType"] = OSD.FromString(assetContentType);
 
+            string ownerID = item.avatarID;
+            string creatorID = item.creatorID;
+
+            // Handle OpenSim profile anchors by rewriting non-UUID creatorIDs to the ownerID
+            // More information on (OSPA) profile anchors @ http://opensimulator.org/wiki/OpenSim_Profile_Anchors
+            UUID creatorUUID;
+            if (!UUID.TryParse(creatorID, out creatorUUID))
+                creatorID = ownerID;
+
             NameValueCollection requestArgs = new NameValueCollection
             {
                 { "RequestMethod", "AddInventoryItem" },
                 { "ItemID", item.inventoryID },
                 { "AssetID", item.assetID },
                 { "ParentID", parentFolderID },
-                { "OwnerID", item.avatarID },
+                { "OwnerID", ownerID },
                 { "Name", item.inventoryName },
                 { "Description", item.inventoryDescription },
-                { "CreatorID", item.creatorID },
+                { "CreatorID", creatorID },
                 { "ContentType", invContentType },
                 { "ExtraData", OSDParser.SerializeJsonString(extraData) }
             };
