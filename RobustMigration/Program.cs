@@ -112,15 +112,11 @@ namespace RobustMigration
             {
                 using (v069.opensim db = new v069.opensim(connection))
                 {
-                    var assetStoreMigration = db.migrations.SingleOrDefault(m => m.name == ASSET_STORE_MIGRATION);
+                    var assetStoreMigration = db.migrations.SingleOrDefault(m => ASSET_STORE_MIGRATION == m.name);
 
                     if (assetStoreMigration != null && assetStoreMigration.version.HasValue)
                     {
-                        if (assetStoreMigration.version.Value > LAST_069_ASSET_MIGRATION)
-                            is070 = true;
-                        else
-                            is070 = false;
-
+                        is070 = (assetStoreMigration.version.Value > LAST_069_ASSET_MIGRATION);
                         return true;
                     }
                 }
