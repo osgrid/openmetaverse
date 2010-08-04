@@ -820,7 +820,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="avatars")]
+	[Table(Name="Avatars")]
 	public partial class avatars : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -2069,7 +2069,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="friends")]
+	[Table(Name="Friends")]
 	public partial class friends : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -2220,7 +2220,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="griduser")]
+	[Table(Name="GridUser")]
 	public partial class griduser : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -4458,7 +4458,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="presence")]
+	[Table(Name="Presence")]
 	public partial class presence : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -10621,7 +10621,7 @@ namespace RobustMigration.v070
 		}
 	}
 	
-	[Table(Name="useraccounts")]
+	[Table(Name="UserAccounts")]
 	public partial class useraccounts : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
