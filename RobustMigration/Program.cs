@@ -41,6 +41,7 @@ namespace RobustMigration
             string userUrl = null;
             string inventoryUrl = null;
             string assetUrl = null;
+            string gridOwner = null;
 
             #region Command Line Argument Handling
 
@@ -48,14 +49,15 @@ namespace RobustMigration
             {
                 { "c=|connection=", "OpenSim database connection string (ex. \"Data Source=localhost;Database=opensim;User ID=opensim;Password=opensim;\")", v => connectionString = v },
                 { "u=|user=", "SimianGrid user service URL (ex. http://localhost/Grid/)", v => userUrl = v },
-                { "i=|inventory=", "SimianGrid inventory service URL (ex. http://localhost/Grid/)", v => inventoryUrl = v },
-                { "a=|asset=", "SimianGrid asset service URL (ex. http://localhost/Grid/)", v => assetUrl = v },
+                { "i=|inventory=", "SimianGrid inventory service URL (ex. http://localhost/Grid/) (optional)", v => inventoryUrl = v },
+                { "a=|asset=", "SimianGrid asset service URL (ex. http://localhost/Grid/) (optional)", v => assetUrl = v },
+                { "g=|gridowner=", "Full name of a migrated user to appoint as the grid owner (ex. \"Master OpenSim\") (optional)", v => gridOwner = v },
                 { "h|?|help", "Show this help", v => printHelp = true },
                 { "v|version", "Show version information", v => printVersion = true }
             };
             set.Parse(args);
 
-            if (String.IsNullOrEmpty(connectionString))
+            if (String.IsNullOrEmpty(connectionString) || String.IsNullOrEmpty(userUrl))
                 printHelp = true;
 
             if (printHelp || printVersion)
@@ -88,9 +90,9 @@ namespace RobustMigration
                 if (TryGetStoreVersion(connectionString, out is070))
                 {
                     if (is070)
-                        Migrate070(connectionString, userUrl, assetUrl, inventoryUrl);
+                        Migrate070(connectionString, userUrl, assetUrl, inventoryUrl, gridOwner);
                     else
-                        Migrate069(connectionString, userUrl, assetUrl, inventoryUrl);
+                        Migrate069(connectionString, userUrl, assetUrl, inventoryUrl, gridOwner);
                 }
                 else
                 {
@@ -126,14 +128,14 @@ namespace RobustMigration
             return false;
         }
 
-        static void Migrate069(string connectionString, string userUrl, string assetUrl, string inventoryUrl)
+        static void Migrate069(string connectionString, string userUrl, string assetUrl, string inventoryUrl, string gridOwner)
         {
             Console.WriteLine("Migrating from OpenSim 0.6.9 to SimianGrid");
 
             if (!String.IsNullOrEmpty(userUrl))
             {
                 Console.WriteLine("Starting user migrations");
-                v069.UserMigration users = new v069.UserMigration(connectionString, userUrl);
+                v069.UserMigration users = new v069.UserMigration(connectionString, userUrl, gridOwner);
                 Console.WriteLine();
             }
 
@@ -161,14 +163,14 @@ namespace RobustMigration
             Console.WriteLine("Done.");
         }
 
-        static void Migrate070(string connectionString, string userUrl, string assetUrl, string inventoryUrl)
+        static void Migrate070(string connectionString, string userUrl, string assetUrl, string inventoryUrl, string gridOwner)
         {
             Console.WriteLine("Migrating from OpenSim 0.7.0 to SimianGrid");
 
             if (!String.IsNullOrEmpty(userUrl))
             {
                 Console.WriteLine("Starting user migrations");
-                v070.UserMigration users = new v070.UserMigration(connectionString, userUrl);
+                v070.UserMigration users = new v070.UserMigration(connectionString, userUrl, gridOwner);
                 Console.WriteLine();
             }
 

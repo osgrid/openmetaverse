@@ -42,8 +42,9 @@ namespace RobustMigration.v069
         private MySqlConnection m_connection;
         private opensim m_db;
         private string m_userUrl;
+        private bool m_masterUserSet;
 
-        public UserMigration(string connectString, string userServiceUrl)
+        public UserMigration(string connectString, string userServiceUrl, string gridOwner)
         {
             using (m_connection = new MySqlConnection(connectString))
             {
@@ -57,18 +58,30 @@ namespace RobustMigration.v069
 
                     foreach (var user in users)
                     {
-                        CreateUser(user);
+                        CreateUser(user, gridOwner);
                         Console.Write("+");
                     }
                 }
             }
+
+            if (!m_masterUserSet)
+                Console.WriteLine("No grid owner set. You should manually assign one user to have an access level of 255 in the database");
         }
 
-        private void CreateUser(users user)
+        private void CreateUser(users user, string gridOwner)
         {
             // Create this user
             string name = user.username + " " + user.lastname;
             string email = user.email;
+
+            // If this is the grid owner set them to the maximum AccessLevel. Otherwise, make sure 
+            // their AccessLevel is at least 1 (representing a verified, non-anonymous account)
+            int accessLevel = (!String.IsNullOrEmpty(gridOwner) && name.Equals(gridOwner, StringComparison.InvariantCultureIgnoreCase))
+                ? 255
+                : user.godLevel;
+            accessLevel = Utils.Clamp(accessLevel, 1, 255);
+            if (accessLevel == 255)
+                m_masterUserSet = true;
 
             // Cannot have an empty e-mail address
             if (String.IsNullOrEmpty(email))
@@ -80,7 +93,7 @@ namespace RobustMigration.v069
                 { "UserID", user.UUID },
                 { "Name", name },
                 { "Email", email },
-                { "AccessLevel", user.godLevel.ToString() }
+                { "AccessLevel", accessLevel.ToString() }
             };
 
             OSDMap response = WebUtil.PostToService(m_userUrl, requestArgs);
@@ -199,7 +212,7 @@ namespace RobustMigration.v069
             string name = user.username + " " + user.lastname;
             string credential = user.passwordHash;
 
-            // If the password is actually salted store "hash:salt"
+            // If the password is actually salted, store "hash:salt"
             if (!String.IsNullOrEmpty(user.passwordSalt))
                 credential += ":" + user.passwordSalt;
 

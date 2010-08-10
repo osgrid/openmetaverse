@@ -73,8 +73,9 @@ namespace RobustMigration.v070
         private MySqlConnection m_connection;
         private opensim m_db;
         private string m_userUrl;
+        private bool m_masterUserSet;
 
-        public UserMigration(string connectString, string userServiceUrl)
+        public UserMigration(string connectString, string userServiceUrl, string gridOwner)
         {
             using (m_connection = new MySqlConnection(connectString))
             {
@@ -88,18 +89,30 @@ namespace RobustMigration.v070
 
                     foreach (var user in users)
                     {
-                        CreateUser(user);
+                        CreateUser(user, gridOwner);
                         Console.Write("+");
                     }
                 }
             }
+
+            if (!m_masterUserSet)
+                Console.WriteLine("No grid owner set. You should manually assign one user to have an access level of 255 in the database");
         }
 
-        private void CreateUser(useraccounts user)
+        private void CreateUser(useraccounts user, string gridOwner)
         {
             // Create this user
             string name = user.FirstName + " " + user.LastName;
             string email = user.Email;
+
+            // If this is the grid owner set them to the maximum AccessLevel. Otherwise, make sure 
+            // their AccessLevel is at least 1 (representing a verified, non-anonymous account)
+            int accessLevel = (!String.IsNullOrEmpty(gridOwner) && name.Equals(gridOwner, StringComparison.InvariantCultureIgnoreCase))
+                ? 255
+                : user.UserLevel;
+            accessLevel = Utils.Clamp(accessLevel, 1, 255);
+            if (accessLevel == 255)
+                m_masterUserSet = true;
 
             // Cannot have an empty e-mail address
             if (String.IsNullOrEmpty(email))
@@ -111,7 +124,7 @@ namespace RobustMigration.v070
                 { "UserID", user.PrincipalID },
                 { "Name", name },
                 { "Email", email },
-                { "AccessLevel", user.UserLevel.ToString() }
+                { "AccessLevel", accessLevel.ToString() }
             };
 
             OSDMap response = WebUtil.PostToService(m_userUrl, requestArgs);
