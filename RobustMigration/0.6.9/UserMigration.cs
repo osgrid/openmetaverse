@@ -193,7 +193,7 @@ namespace RobustMigration.v069
 
             foreach (var attachment in attachments)
             {
-                attachMap["_ap_" + attachment.attachpoint] = OSD.FromString(attachment.asset);
+                attachMap[AP_PREFIX + attachment.attachpoint] = OSD.FromString(attachment.item);
             }
 
             Dictionary<string, string> userData = new Dictionary<string, string>();
